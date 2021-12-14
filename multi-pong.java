@@ -1,71 +1,86 @@
-import javax.swing.*;
-import java.awt.*;
+package multipong;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class Pingpong extends JPanel {
-    Ball ball = new Ball(this);
-    Racquet racquet = new Racquet(this);
-    int speed = 1;
+public class game extends JPanel {
 
-    public Pingpong() {
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
+	ball ball = new ball(this);
+	racquet racquet = new racquet(this);
+	int speed = 1;
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                racquet.keyReleased(e);
-            }
+	private int getScore() {
+		return speed - 1;
+	}
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                racquet.keyPressed(e);
-            }
-        });
-        setFocusable(true);
-    }
+	public game() {
+		addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
 
-    private int getScore() {
-        return speed - 1;
-    }
+			@Override
+			public void keyReleased(KeyEvent e) {
+				racquet.keyReleased(e);
+			}
 
-    private void move() {
-        ball.move();
-        racquet.move();
-    }
+			@Override
+			public void keyPressed(KeyEvent e) {
+				racquet.keyPressed(e);
+			}
+		});
+		setFocusable(true);
+		sound.BACK.loop();
+	}
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        ball.paint(g2d);
-        racquet.paint(g2d);
-    }
+	private void move() {
+		ball.move();
+		racquet.move();
+	}
 
-    public void gameOver() {
-        JOptionPane.showMessageDialog(this, "Game Over", "Game Over", JOptionPane.YES_NO_OPTION);
-        System.exit(ABORT);
-    }
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		ball.paint(g2d);
+		racquet.paint(g2d);
 
-    public static void main(String[] args) throws InterruptedException {
-        JFrame frame = new JFrame("Mini Tennis");
-        Game game = new Game();
-        frame.add(game);
-        frame.setSize(300, 400);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		g2d.setColor(Color.BLUE);
+		g2d.setFont(new Font("Verdana", Font.BOLD, 40));
+		g2d.drawString(String.valueOf(getScore()), 10, 30);
+	}
 
-        while (true) {
-            game.move();
-            game.repaint();
-            Thread.sleep(10);
-        }
-    }
+	public void gameOver() {
+		sound.BACK.stop();
+		sound.GAMEOVER.play();
+		JOptionPane.showMessageDialog(this, "your score is: " + getScore(),
+				"Game Over", JOptionPane.YES_NO_OPTION);
+		System.exit(ABORT);
+	}
+
+	public static void main(String[] args) throws InterruptedException {
+		JFrame frame = new JFrame("Multi-Pong!");
+		game game = new game();
+		frame.add(game);
+		frame.setSize(300, 400);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		while (true) {
+			game.move();
+			game.repaint();
+			Thread.sleep(10);
+		}
+	}
 }
-
-    
